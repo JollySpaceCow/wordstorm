@@ -1,0 +1,22 @@
+{
+  "name": "Wordstorm",
+  "short_name": "Wordstorm",
+  "description": "Create a cinematic 3D wordstorm animation and record it as a WebM video.",
+  "start_url": "/wordstorm/",
+  "scope": "/wordstorm/",
+  "display": "standalone",
+  "background_color": "#0b0713",
+  "theme_color": "#0b0713",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
