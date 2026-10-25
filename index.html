@@ -71,6 +71,7 @@ input[type=number]{width:5.5em}
 <p class="hint">The clip starts <b>Lead-in</b> seconds before your first timestamp so the letters can be seen flying in. So frame 0 of the recording = speech time −lead-in. Line the clip up in your editor accordingly. Recording renders every frame offline at exactly 60 fps and downloads a VP9 WebM. Alpha modes need an editor with the libvpx-vp9 decoder (e.g. Shotcut). Desktop Chrome/Edge.</p>
 </div>
 </div>
+<script src="public/vendor/mediabunny-1.60.0.classic.js"></script>
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d',{willReadFrequently:true});
 const seek=document.getElementById('seek'),ro=document.getElementById('ro'),playB=document.getElementById('play'),ta=document.getElementById('ts'),statusEl=document.getElementById('status'),leadEl=document.getElementById('lead'),ghostEl=document.getElementById('ghost');
@@ -420,21 +421,14 @@ async function recordCanvasProper(cfg) {
   // above) — NOT from the browser, which can't produce them.
   let mediabunny;
   try {
-    // Loading the raw multi-file module tree (dist/modules/src/index.js and
-    // its ~20 sibling files, each a separate relative import) is the riskier
-    // way to pull this off a CDN — any one of those files hiccuping (a CORS
-    // quirk, a stale cache, a redirect jsdelivr's relative-import resolution
-    // doesn't like) fails the whole import. jsdelivr's `+esm` endpoint
-    // bundles the package into a single dependency-resolved file server-side
-    // instead, which is the same job a bundler would do locally — one
-    // request, nothing left for the browser to resolve on its own.
-    mediabunny = await import('https://cdn.jsdelivr.net/npm/mediabunny@1.60.0/+esm');
+    // This is a pinned, same-origin classic bundle loaded before the app.
+    // Unlike an ES-module import, a normal script is permitted when this app
+    // is opened directly from disk (file://), which Firefox blocks for
+    // imported modules. It also removes the CDN request from recording.
+    mediabunny = globalThis.Mediabunny;
+    if (!mediabunny) throw new Error('the local bundle did not load');
   } catch (e) {
-    // Surface the REAL browser error (a 404, a CORS failure, a parse error —
-    // whatever it actually was) instead of a made-up generic one, since a
-    // guessed message here is exactly what makes a failure like this hard to
-    // diagnose after the fact.
-    throw new Error(`could not load the video muxer (${e.message || e}) — check your connection`);
+    throw new Error(`could not load the bundled video muxer (${e.message || e})`);
   }
   const { Output, WebMOutputFormat, BufferTarget, EncodedVideoPacketSource, EncodedPacket } = mediabunny;
 
